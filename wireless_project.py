@@ -3,9 +3,10 @@ import cv2
 import math
 import time
 import pygame
-import serial
+import requests
 
-Arduino = serial.Serial(port='COM4', baudrate=9600)
+headers={"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"}
+BLYNK_AUTH_TOKEN =  "WRktIGpEPZQlqbmmHY0yryoaqDUZrDeA"
 
 class Timer:
     def __init__(self, time_between=5):
@@ -68,35 +69,25 @@ while Running:
         stearing_center = (int((x1 + x2)/2), int((y2 + y1)/2)) 
         distance = int(math.hypot(x2 - x1, y2 - y1)/2)
 
-        if REVERSE == True:
-            orientation = "Reverse"
-        else:
-            orientation = "Forward"
         try:
             slope = (y2 - y1) / (x2 - x1)
             if slope > 1:
                 print(f"{orientation} GO LEFT")
-                if(orientation == "Reverse"):
-                    Arduino.write(b"ReverseGoLeft\n")
-                else:
-                    Arduino.write(b"ForwardGoLeft\n")
-                
+                # r = requests.get(f"https://blynk.cloud/external/api/update?token={BLYNK_AUTH_TOKEN}&v1=1", headers, stream=True)
             elif slope < -1:
                 print(f"{orientation} GO RIGHT")
-                if(orientation == "Reverse"):
-                    Arduino.write(b"ReverseGoRight\n")
-                else:
-                    Arduino.write(b"ForwardGoRight\n")
+                # r = requests.get(f"https://blynk.cloud/external/api/update?token={BLYNK_AUTH_TOKEN}&v1=2", headers, stream=True)
             else:
-                print(f"{orientation} GO STRAIGHT")
-                if(orientation == "Reverse"):
-                    Arduino.write(b"ReverseGoStraight\n")
-                else:
-                    Arduino.write(b"ForwardGoStraight\n")
-          
+                print(f"{orientation} GO STRAIGT")
+                # r = requests.get(f"https://blynk.cloud/external/api/update?token={BLYNK_AUTH_TOKEN}&v1=2", headers, stream=True)
+            # print(r.status_code)
         except:
             pass
         
+    if REVERSE == True:
+        orientation = "Reverse"
+    else:
+        orientation = "Forward"
 
     img = cv2.flip(img, 1)
     cv2.putText(img=img, text=str(orientation), org=(10, 20), fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1, color=(0, 255, 0),thickness=3)
